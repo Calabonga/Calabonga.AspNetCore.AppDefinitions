@@ -2,7 +2,7 @@ name: .NET Core
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build:
@@ -15,13 +15,11 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Install dependencies
-        run: dotnet restore src/Calabonga.OperationResults.sln
+        run: dotnet restore src/Calabonga.AspNetCore.AppDefinitions.sln
       - name: Build
-        run: dotnet build src/Calabonga.OperationResults.sln --configuration Release --no-restore
-      - name: Tests
-        run: dotnet test src/Calabonga.OperationResults.Tests/Calabonga.OperationResults.Tests.csproj
-      - name: Publish OperationResultCore
+        run: dotnet build src/Calabonga.AspNetCore.AppDefinitions.sln --configuration Release --no-restore
+      - name: Publish Calabonga.AspNetCore.AppDefinitions
         uses: brandedoutcast/publish-nuget@v2.5.2
         with:
-          PROJECT_FILE_PATH: src/Calabonga.OperationResults/Calabonga.OperationResults.csproj
+          PROJECT_FILE_PATH: src/Calabonga.AspNetCore.AppDefinitions/Calabonga.AspNetCore.AppDefinitions.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
