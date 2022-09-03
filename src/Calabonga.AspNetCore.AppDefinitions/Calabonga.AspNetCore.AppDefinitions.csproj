@@ -13,7 +13,7 @@
 		<Description>Application Definitions base classes. The small but very helpful packege that can help you to organize your ASP.NET Core application.</Description>
 		<Copyright>Calabonga</Copyright>
 		<PackageProjectUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</PackageProjectUrl>
-		<PackageIcon>__TemplateIcon.png</PackageIcon>
+		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -27,11 +27,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\..\..\..\Users\calab\Pictures\__TemplateIcon.png">
+	  <None Include="..\..\README.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
-	  <None Include="..\..\README.md">
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="logo.png">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
