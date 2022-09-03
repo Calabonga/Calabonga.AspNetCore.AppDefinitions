@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>Calabonga.AspNetCore.AppDefinitions</Title>
+		<Version>1.0.0-beta1</Version>
+		<Authors>Calabonga</Authors>
+		<Company>Calabonga Soft</Company>
+		<Product>Calabonga.AspNetCore.AppDefinitions</Product>
+		<Description>Application Definitions base classes. The small but very helpful packege that can help you to organize your ASP.NET Core application.</Description>
+		<Copyright>Calabonga</Copyright>
+		<PackageProjectUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</PackageProjectUrl>
+		<PackageIcon>__TemplateIcon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>calabonga;architecture;definitions;minimal-api;nimble-framework</PackageTags>
+		<PackageReleaseNotes>First release</PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\..\Users\calab\Pictures\__TemplateIcon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+</Project>

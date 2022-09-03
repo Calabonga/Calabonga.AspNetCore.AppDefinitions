@@ -1,0 +1,27 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Install dependencies
+        run: dotnet restore src/Calabonga.OperationResults.sln
+      - name: Build
+        run: dotnet build src/Calabonga.OperationResults.sln --configuration Release --no-restore
+      - name: Tests
+        run: dotnet test src/Calabonga.OperationResults.Tests/Calabonga.OperationResults.Tests.csproj
+      - name: Publish OperationResultCore
+        uses: brandedoutcast/publish-nuget@v2.5.2
+        with:
+          PROJECT_FILE_PATH: src/Calabonga.OperationResults/Calabonga.OperationResults.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
