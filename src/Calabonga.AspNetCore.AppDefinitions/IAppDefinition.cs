@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Calabonga.AspNetCore.AppDefinitions;
@@ -13,16 +11,15 @@ internal interface IAppDefinition
     /// <summary>
     /// Configure services for current application
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configuration"></param>
-    void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+    /// <param name="services">instance of <see cref="IServiceCollection"/></param>
+    /// <param name="builder">instance of <see cref="WebApplicationBuilder"/></param>
+    void ConfigureServices(IServiceCollection services, WebApplicationBuilder builder);
 
     /// <summary>
     /// Configure application for current application
     /// </summary>
     /// <param name="app"></param>
-    /// <param name="env"></param>
-    void ConfigureApplication(WebApplication app, IWebHostEnvironment env);
+    void ConfigureApplication(WebApplication app);
 
     /// <summary>
     /// Order index for including into pipeline. Default value is 0 for, that's why order index can be undefined.

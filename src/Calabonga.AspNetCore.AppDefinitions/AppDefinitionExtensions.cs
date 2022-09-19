@@ -36,7 +36,7 @@ public static class AppDefinitionExtensions
             definitions.AddRange(instancesOrdered);
         }
 
-        definitions.ForEach(app => app.ConfigureServices(source, builder.Configuration));
+        definitions.ForEach(app => app.ConfigureServices(source, builder));
         source.AddSingleton(definitions as IReadOnlyCollection<IAppDefinition>);
 
     }
@@ -53,17 +53,14 @@ public static class AppDefinitionExtensions
     {
         var logger = source.Services.GetRequiredService<ILogger<AppDefinition>>();
         var environment = source.Services.GetRequiredService<IWebHostEnvironment>();
-
         var definitions = source.Services.GetRequiredService<IReadOnlyCollection<IAppDefinition>>();
         var instancesOrdered = definitions.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
-        foreach (var endpoint in instancesOrdered)
-        {
-            endpoint.ConfigureApplication(source, environment);
-        }
+        
+        instancesOrdered.ForEach(x => x.ConfigureApplication(source));
 
         if (environment.IsDevelopment())
         {
-            logger.LogDebug("Total application definitions configured {0}", instancesOrdered.Count());
+            logger.LogDebug("Total application definitions configured {0}", instancesOrdered.Count);
         }
     }
 
