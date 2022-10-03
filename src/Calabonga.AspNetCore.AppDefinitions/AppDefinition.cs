@@ -29,5 +29,5 @@ public abstract class AppDefinition : IAppDefinition
     /// <summary>
     /// Enable or disable to register into pipeline for the current application definition
     /// </summary>
-    public virtual bool Enabled => true;
+    public virtual bool Enabled { get; protected set; } = true;
 }
