@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Calabonga.AspNetCore.AppDefinitions</Title>
-		<Version>1.2.0</Version>
+		<Version>1.2.1</Version>
 		<Authors>Calabonga</Authors>
 		<Company>Calabonga Soft</Company>
 		<Product>Calabonga.AspNetCore.AppDefinitions</Product>

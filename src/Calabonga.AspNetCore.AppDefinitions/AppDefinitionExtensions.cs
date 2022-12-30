@@ -29,8 +29,8 @@ public static class AppDefinitionExtensions
             var instancesOrdered = instances.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
             if (builder.Environment.IsDevelopment())
             {
-                logger.LogDebug("[AppDefinitions] Founded: {0}. Enabled: {1}", instances.Count, instancesOrdered.Count);
-                logger.LogDebug("[AppDefinitions] Registered [{0}]", string.Join(", ", instancesOrdered.Select(x => x.GetType().Name).ToArray()));
+                logger.LogDebug(@"[AppDefinitions] Founded: {AppDefinitionsCountTotal}. Enabled: {AppDefinitionsCountEnabled}", instances.Count, instancesOrdered.Count);
+                logger.LogDebug(@"[AppDefinitions] Registered [{Total}]", string.Join(", ", instancesOrdered.Select(x => x.GetType().Name).ToArray()));
             }
 
             definitions.AddRange(instancesOrdered);
@@ -38,7 +38,6 @@ public static class AppDefinitionExtensions
 
         definitions.ForEach(app => app.ConfigureServices(source, builder));
         source.AddSingleton(definitions as IReadOnlyCollection<IAppDefinition>);
-
     }
 
     /// <summary>
@@ -60,7 +59,7 @@ public static class AppDefinitionExtensions
 
         if (environment.IsDevelopment())
         {
-            logger.LogDebug("Total application definitions configured {0}", instancesOrdered.Count);
+            logger.LogDebug("Total application definitions configured {Count}", instancesOrdered.Count);
         }
     }
 
