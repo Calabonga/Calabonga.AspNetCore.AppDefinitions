@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Calabonga.AspNetCore.AppDefinitions;
@@ -27,7 +26,7 @@ public static class AppDefinitionExtensions
             var types = entryPoint.Assembly.ExportedTypes.Where(x => !x.IsAbstract && typeof(IAppDefinition).IsAssignableFrom(x));
             var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().ToList();
             var instancesOrdered = instances.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
-            if (builder.Environment.IsDevelopment())
+            if (logger.IsEnabled(LogLevel.Debug))
             {
                 logger.LogDebug(@"[AppDefinitions] Founded: {AppDefinitionsCountTotal}. Enabled: {AppDefinitionsCountEnabled}", instances.Count, instancesOrdered.Count);
                 logger.LogDebug(@"[AppDefinitions] Registered [{Total}]", string.Join(", ", instancesOrdered.Select(x => x.GetType().Name).ToArray()));
@@ -54,10 +53,10 @@ public static class AppDefinitionExtensions
         var environment = source.Services.GetRequiredService<IWebHostEnvironment>();
         var definitions = source.Services.GetRequiredService<IReadOnlyCollection<IAppDefinition>>();
         var instancesOrdered = definitions.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
-        
+
         instancesOrdered.ForEach(x => x.ConfigureApplication(source));
 
-        if (environment.IsDevelopment())
+        if (logger.IsEnabled(LogLevel.Debug))
         {
             logger.LogDebug("Total application definitions configured {Count}", instancesOrdered.Count);
         }
