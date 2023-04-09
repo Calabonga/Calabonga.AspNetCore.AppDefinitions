@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -50,7 +49,6 @@ public static class AppDefinitionExtensions
     public static void UseDefinitions(this WebApplication source)
     {
         var logger = source.Services.GetRequiredService<ILogger<AppDefinition>>();
-        var environment = source.Services.GetRequiredService<IWebHostEnvironment>();
         var definitions = source.Services.GetRequiredService<IReadOnlyCollection<IAppDefinition>>();
         var instancesOrdered = definitions.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
 
