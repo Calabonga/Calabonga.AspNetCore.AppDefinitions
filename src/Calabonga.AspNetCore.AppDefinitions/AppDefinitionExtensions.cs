@@ -20,22 +20,46 @@ public static class AppDefinitionExtensions
     {
         var logger = source.BuildServiceProvider().GetRequiredService<ILogger<AppDefinition>>();
         var definitions = new List<IAppDefinition>();
+        var appDefinitionInfo = source.BuildServiceProvider().GetService<AppDefinitionCollection>();
+        var info = appDefinitionInfo ?? new AppDefinitionCollection();
+
         foreach (var entryPoint in entryPointsAssembly)
         {
+            info.AddEntryPoint(entryPoint.Name);
+
+
             var types = entryPoint.Assembly.ExportedTypes.Where(x => !x.IsAbstract && typeof(IAppDefinition).IsAssignableFrom(x));
             var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().ToList();
-            var instancesOrdered = instances.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
-            if (logger.IsEnabled(LogLevel.Debug))
+            //if (logger.IsEnabled(LogLevel.Debug))
+            //{
+            //    logger.LogDebug("AppDefinitions Founded: {@AppDefinitionsCountTotal}.", instances.Count);
+            //}
+
+            foreach (var definition in instances)
             {
-                logger.LogDebug(@"[AppDefinitions] Founded: {AppDefinitionsCountTotal}. Enabled: {AppDefinitionsCountEnabled}", instances.Count, instancesOrdered.Count);
-                logger.LogDebug(@"[AppDefinitions] Registered [{Total}]", string.Join(", ", instancesOrdered.Select(x => x.GetType().Name).ToArray()));
+                info.AddInfo(new AppDefinitionItem(definition));
             }
 
+            var instancesOrdered = instances.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
             definitions.AddRange(instancesOrdered);
         }
 
-        definitions.ForEach(app => app.ConfigureServices(source, builder));
-        source.AddSingleton(definitions as IReadOnlyCollection<IAppDefinition>);
+        foreach (var definition in definitions)
+        {
+            definition.ConfigureServices(source, builder);
+        }
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug("[AppDefinitions]: From {@items}", string.Join(", ", info.EntryPoints));
+
+
+            foreach (var item in info.Items.OrderBy(x => x.Definition.GetType().Name))
+            {
+                logger.LogDebug("[AppDefinitions]: {@AppDefinitionName} (Enabled: {@Enabled})", item.Definition.GetType().Name, item.Definition.Enabled ? "Yes" : "No");
+            }
+        }
+
+        source.AddSingleton(info);
     }
 
     /// <summary>
@@ -49,14 +73,20 @@ public static class AppDefinitionExtensions
     public static void UseDefinitions(this WebApplication source)
     {
         var logger = source.Services.GetRequiredService<ILogger<AppDefinition>>();
-        var definitions = source.Services.GetRequiredService<IReadOnlyCollection<IAppDefinition>>();
-        var instancesOrdered = definitions.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
-
-        instancesOrdered.ForEach(x => x.ConfigureApplication(source));
+        var definitions = source.Services.GetRequiredService<AppDefinitionCollection>();
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
-            logger.LogDebug("Total application definitions configured {Count}", instancesOrdered.Count);
+            logger.LogDebug("From {Modules} assemblies totally AppDefinitions found: {Count} ", string.Join(", ", definitions.EntryPoints), definitions.Items.Count);
+        }
+
+        var instancesOrdered = definitions.Items.Where(x => x.Definition.Enabled).OrderBy(x => x.Definition.OrderIndex).ToList();
+
+        instancesOrdered.ForEach(x => x.Definition.ConfigureApplication(source));
+
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug("Total AppDefinitions applied: {Count}", instancesOrdered.Count);
         }
     }
 

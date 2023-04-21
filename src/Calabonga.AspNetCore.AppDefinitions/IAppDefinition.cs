@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Calabonga.AspNetCore.AppDefinitions;
 
 /// <summary>
-/// Application definition interface abstraction
+/// Application Definition interface abstraction
 /// </summary>
-internal interface IAppDefinition
+public interface IAppDefinition
 {
     /// <summary>
     /// Configure services for current application
@@ -27,7 +27,7 @@ internal interface IAppDefinition
     int OrderIndex { get; }
 
     /// <summary>
-    /// Enable or disable to register into pipeline for the current application definition
+    /// Enable or disable to register into pipeline for the current application Definition
     /// </summary>
     bool Enabled { get; }
 }

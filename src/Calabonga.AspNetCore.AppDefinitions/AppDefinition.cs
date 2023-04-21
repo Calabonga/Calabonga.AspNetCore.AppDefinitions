@@ -27,7 +27,7 @@ public abstract class AppDefinition : IAppDefinition
     public virtual int OrderIndex => 0;
 
     /// <summary>
-    /// Enable or disable to register into pipeline for the current application definition
+    /// Enable or disable to register into pipeline for the current application Definition
     /// </summary>
     public virtual bool Enabled { get; protected set; } = true;
 }
