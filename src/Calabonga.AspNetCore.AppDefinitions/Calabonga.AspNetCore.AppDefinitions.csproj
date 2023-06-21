@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Calabonga.AspNetCore.AppDefinitions</Title>
-		<Version>1.3.0</Version>
+		<Version>2.0.0-beta1</Version>
 		<Authors>Calabonga</Authors>
 		<Company>Calabonga Soft</Company>
 		<Product>Calabonga.AspNetCore.AppDefinitions</Product>
@@ -18,7 +18,7 @@
 		<RepositoryUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>calabonga;architecture;definitions;minimal-api;nimble-framework</PackageTags>
-		<PackageReleaseNotes>AppDefinitions new registration information on debug model was implemented</PackageReleaseNotes>
+		<PackageReleaseNotes>IServiceCollection was removed. Just use WebApplicationBuilder.Services please.</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 

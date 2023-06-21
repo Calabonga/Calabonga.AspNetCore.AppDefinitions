@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Calabonga.AspNetCore.AppDefinitions;
 
@@ -11,9 +10,8 @@ public abstract class AppDefinition : IAppDefinition
     /// <summary>
     /// Configure services for current application
     /// </summary>
-    /// <param name="services">instance of <see cref="IServiceCollection"/></param>
     /// <param name="builder">instance of <see cref="WebApplicationBuilder"/></param>
-    public virtual void ConfigureServices(IServiceCollection services, WebApplicationBuilder builder) { }
+    public virtual void ConfigureServices(WebApplicationBuilder builder) { }
 
     /// <summary>
     /// Configure application for current application

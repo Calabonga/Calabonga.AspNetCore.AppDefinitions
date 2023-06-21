@@ -13,27 +13,21 @@ public static class AppDefinitionExtensions
     /// <remarks>
     /// When executing on development environment there are more diagnostic information available on console.
     /// </remarks>
-    /// <param name="source"></param>
     /// <param name="builder"></param>
     /// <param name="entryPointsAssembly"></param>
-    public static void AddDefinitions(this IServiceCollection source, WebApplicationBuilder builder, params Type[] entryPointsAssembly)
+    public static void AddDefinitions(this WebApplicationBuilder builder, params Type[] entryPointsAssembly)
     {
-        var logger = source.BuildServiceProvider().GetRequiredService<ILogger<AppDefinition>>();
+        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<AppDefinition>>();
         var definitions = new List<IAppDefinition>();
-        var appDefinitionInfo = source.BuildServiceProvider().GetService<AppDefinitionCollection>();
+        var appDefinitionInfo = builder.Services.BuildServiceProvider().GetService<AppDefinitionCollection>();
         var info = appDefinitionInfo ?? new AppDefinitionCollection();
 
         foreach (var entryPoint in entryPointsAssembly)
         {
             info.AddEntryPoint(entryPoint.Name);
 
-
             var types = entryPoint.Assembly.ExportedTypes.Where(x => !x.IsAbstract && typeof(IAppDefinition).IsAssignableFrom(x));
             var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().ToList();
-            //if (logger.IsEnabled(LogLevel.Debug))
-            //{
-            //    logger.LogDebug("AppDefinitions Founded: {@AppDefinitionsCountTotal}.", instances.Count);
-            //}
 
             foreach (var definition in instances)
             {
@@ -46,7 +40,7 @@ public static class AppDefinitionExtensions
 
         foreach (var definition in definitions)
         {
-            definition.ConfigureServices(source, builder);
+            definition.ConfigureServices(builder);
         }
         if (logger.IsEnabled(LogLevel.Debug))
         {
@@ -59,7 +53,7 @@ public static class AppDefinitionExtensions
             }
         }
 
-        source.AddSingleton(info);
+        builder.Services.AddSingleton(info);
     }
 
     /// <summary>
