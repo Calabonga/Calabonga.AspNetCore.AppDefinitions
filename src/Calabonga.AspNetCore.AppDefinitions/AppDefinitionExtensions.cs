@@ -31,7 +31,7 @@ public static class AppDefinitionExtensions
 
             foreach (var definition in instances)
             {
-                info.AddInfo(new AppDefinitionItem(definition));
+                info.AddInfo(new AppDefinitionItem(definition, entryPoint.Name));
             }
 
             var instancesOrdered = instances.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
@@ -42,14 +42,14 @@ public static class AppDefinitionExtensions
         {
             definition.ConfigureServices(builder);
         }
+
         if (logger.IsEnabled(LogLevel.Debug))
         {
             logger.LogDebug("[AppDefinitions]: From {@items}", string.Join(", ", info.EntryPoints));
 
-
             foreach (var item in info.Items.OrderBy(x => x.Definition.GetType().Name))
             {
-                logger.LogDebug("[AppDefinitions]: {@AppDefinitionName} (Enabled: {@Enabled})", item.Definition.GetType().Name, item.Definition.Enabled ? "Yes" : "No");
+                logger.LogDebug("[AppDefinitions]: {@AppDefinitionName} ({@AssemblyName}) (Enabled: {@Enabled})", item.Definition.GetType().Name, item.AssemblyName, item.Definition.Enabled ? "Yes" : "No");
             }
         }
 

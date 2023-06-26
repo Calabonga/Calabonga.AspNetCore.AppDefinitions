@@ -28,4 +28,4 @@ internal sealed class AppDefinitionCollection
 /// Information about <see cref="IAppDefinition"/>
 /// </summary>
 /// <param name="Definition"></param>
-public sealed record AppDefinitionItem(IAppDefinition Definition);
+public sealed record AppDefinitionItem(IAppDefinition Definition, string AssemblyName);
