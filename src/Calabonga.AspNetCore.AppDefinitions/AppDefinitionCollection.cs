@@ -6,6 +6,7 @@
 internal sealed class AppDefinitionCollection
 {
     internal IList<AppDefinitionItem> Items { get; } = new List<AppDefinitionItem>();
+
     internal IList<string> EntryPoints { get; } = new List<string>();
 
     internal void AddInfo(AppDefinitionItem definition)
@@ -28,4 +29,4 @@ internal sealed class AppDefinitionCollection
 /// Information about <see cref="IAppDefinition"/>
 /// </summary>
 /// <param name="Definition"></param>
-public sealed record AppDefinitionItem(IAppDefinition Definition, string AssemblyName);
+public sealed record AppDefinitionItem(IAppDefinition Definition, string AssemblyName, bool Enabled, bool Exported);

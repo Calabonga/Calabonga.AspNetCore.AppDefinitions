@@ -1,11 +1,71 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace Calabonga.AspNetCore.AppDefinitions;
 
 public static class AppDefinitionExtensions
 {
+    /// <summary>
+    /// Finding all definitions in your project and include their into pipeline. Modules from third party *.dll find too.<br/>
+    /// Using <see cref="IServiceCollection"/> for registration.
+    /// </summary>
+    /// <remarks>
+    /// When executing on development environment there are more diagnostic information available on console.
+    /// </remarks>
+    /// <param name="builder"></param>
+    /// <param name="modulesFolderPath"></param>
+    /// <param name="entryPointsAssembly"></param>
+    public static void AddDefinitionsWithModules(this WebApplicationBuilder builder, string modulesFolderPath, params Type[] entryPointsAssembly)
+    {
+        var modulesFolder = Path.Combine(builder.Environment.ContentRootPath, modulesFolderPath);
+
+        if (!Directory.Exists(modulesFolder))
+        {
+            throw new DirectoryNotFoundException(modulesFolder);
+        }
+
+        var types = new List<Type>();
+        types.AddRange(entryPointsAssembly);
+
+        var modulesDirectory = new DirectoryInfo(modulesFolderPath);
+        var modules = modulesDirectory.GetFiles("*.dll");
+        if (!modules.Any())
+        {
+            return;
+        }
+
+        foreach (var fileInfo in modules)
+        {
+            var module = Assembly.LoadFile(fileInfo.FullName);
+            var typesAll = module.GetExportedTypes();
+            var typesDefinition = typesAll
+                .Where(Predicate)
+                .ToList();
+
+            var instances = typesDefinition.Select(Activator.CreateInstance)
+                .Cast<IAppDefinition>()
+                .Where(x => x.Enabled && x.Exported)
+                .Select(x => x.GetType())
+                .ToList();
+
+            types.AddRange(instances);
+        }
+
+        if (types.Any())
+        {
+            AddDefinitions(builder, types.ToArray());
+        }
+    }
+
+    /// <summary>
+    /// Finds an AppDefinition in the list of types
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    private static bool Predicate(Type type) => type is { IsAbstract: false, IsInterface: false } && typeof(AppDefinition).IsAssignableFrom(type);
+
     /// <summary>
     /// Finding all definitions in your project and include their into pipeline.<br/>
     /// Using <see cref="IServiceCollection"/> for registration.
@@ -17,7 +77,7 @@ public static class AppDefinitionExtensions
     /// <param name="entryPointsAssembly"></param>
     public static void AddDefinitions(this WebApplicationBuilder builder, params Type[] entryPointsAssembly)
     {
-        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<AppDefinition>>();
+        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<IAppDefinition>>();
         var definitions = new List<IAppDefinition>();
         var appDefinitionInfo = builder.Services.BuildServiceProvider().GetService<AppDefinitionCollection>();
         var info = appDefinitionInfo ?? new AppDefinitionCollection();
@@ -26,12 +86,12 @@ public static class AppDefinitionExtensions
         {
             info.AddEntryPoint(entryPoint.Name);
 
-            var types = entryPoint.Assembly.ExportedTypes.Where(x => !x.IsAbstract && typeof(IAppDefinition).IsAssignableFrom(x));
+            var types = entryPoint.Assembly.ExportedTypes.Where(Predicate);
             var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().ToList();
 
             foreach (var definition in instances)
             {
-                info.AddInfo(new AppDefinitionItem(definition, entryPoint.Name));
+                info.AddInfo(new AppDefinitionItem(definition, entryPoint.Name, definition.Enabled, definition.Exported));
             }
 
             var instancesOrdered = instances.Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
@@ -83,5 +143,4 @@ public static class AppDefinitionExtensions
             logger.LogDebug("Total AppDefinitions applied: {Count}", instancesOrdered.Count);
         }
     }
-
 }

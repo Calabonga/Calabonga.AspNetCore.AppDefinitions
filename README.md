@@ -1,6 +1,113 @@
 # Calabonga.AspNetCore.AppDefinitions
 
-Сборка позволяет навести порядок в вашем `Program.cs`. Можно всё разложить "по полочкам". Чтобы воспользоваться сборкой надо:
+Сборка позволяет навести порядок в вашем `Program.cs`. Можно всё разложить "по полочкам". Чтобы воспользоваться сборкой надо просто установить nuget-пакет Calabonga.AspNetCore.AppDefinitions.
+
+## Что нового
+
+### Версия 2.1.0
+
+* В новой версии появилась возможность подключения модулей к проекту. Достаточно воспользовать новым способом регистрации.
+```
+// Вместо этого (instead of)
+builder.AddDefinitions(typeof(Program));
+
+// использовать этот (use this to add definitions for application)
+const string moduleFolder = "Modules:Folder";
+var modulesPath = builder.Configuration[moduleFolder] ?? throw new ArgumentNullException(moduleFolder);
+builder.AddDefinitionsWithModules(modulesPath, typeof(Program));
+```
+* Вывод зарегистрированных AppDefinitions усовершенствована.
+```
+[15:43:03 DBG] [AppDefinitions]: From Program
+[15:43:03 DBG] [AppDefinitions]: AuthorizationDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: AuthorizeEndpoints (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: AutomapperDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: CommonDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: ContainerDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: CorsDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: DataSeedingDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: DbContextDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: ErrorHandlingDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: ETagGeneratorDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: EventItemEndpoints (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: FluentValidationDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: MediatorDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: OpenIddictDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: ProfilesEndpoints (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: SwaggerDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: TokenEndpoints (Program) (Enabled: Yes)
+[15:43:03 DBG] [AppDefinitions]: UnitOfWorkDefinition (Program) (Enabled: Yes)
+[15:43:03 DBG] From Program assemblies totally AppDefinitions found: 18
+[15:43:04 DBG] Total AppDefinitions applied: 18
+```
+* Появилсь возможность не только включать/выключать определенные AppDefinitions, но и указывать нужно ли их экспортировать или нет. Обратите внимание, что по умолчанию `Exported` свойство задано как `False`, то есть, не экспортировать данный `AppDefinition`. Например, если регистрацию конечной точки (endpoint) `WeatherForcast` слелать через определение (AppDefinition), то экспорт мог бы выглядеть так:
+```
+public class WeatherForecastEndpoints : AppDefinition
+{
+    /// <summary>
+    /// Enables or disables export definition as a content for module that can be exported.
+    /// </summary>
+    /// /// <remarks>Default values is <c>False</c></remarks>
+    public override bool Exported => true;
+
+    public override void ConfigureApplication(WebApplication app)
+    {
+        app.MapGet("/weatherforecast", WeatherGet)
+            .ProducesProblem(401)
+            .Produces<WeatherForecast[]>()
+            .WithName("GetWeatherForecast")
+            .WithTags("ModuleTwo")
+            .WithOpenApi()
+            .RequireAuthorization(policyNames: CookieAuthenticationDefaults.AuthenticationScheme + ",OpenIddict.Validation.AspNetCore");
+    }
+
+    // [FeatureGroupName("Weather")]
+    private WeatherForecast[] WeatherGet([FromServices] ILogger<WeatherForecastEndpoints> logger)
+    {
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        var forecast = Enumerable.Range(1, 5).Select(index =>
+                new WeatherForecast
+                (
+                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                    Random.Shared.Next(-20, 55),
+                    summaries[Random.Shared.Next(summaries.Length)]
+                ))
+            .ToArray();
+        logger.LogInformation("WeatherForecast request execute at [{Time}].", DateTime.UtcNow);
+        return forecast;
+    }
+}
+```
+
+### Версия 2.0.0
+
+* Больше не требуется вливать зависимость `IServiceCollection` в метод `ConfigureServices`. Теперь достаточно только `WebApplicationBuilder`. Следовательно при переходе на версию 2.0.0 нужно просто удалить лишние зависимости. Например, регистрация `FluentValidation` это выглядит так:
+``` csharp
+/// <summary>
+/// FluentValidation registration as Application definition
+/// </summary>
+public class FluentValidationDefinition : AppDefinition
+{
+    /// <summary>
+    /// Configure services for current application
+    /// </summary>
+    /// <param name="builder"></param>
+    public override void ConfigureServices(WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
+        });
+
+        builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+    }
+}
+```
+
+* Регистрация стала гораздо проще.
+``` csharp
+builder.AddDefinitions(typeof(Program));
+```
 
 ## Установка nuget-пакета
 

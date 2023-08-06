@@ -25,7 +25,14 @@ public abstract class AppDefinition : IAppDefinition
     public virtual int OrderIndex => 0;
 
     /// <summary>
-    /// Enable or disable to register into pipeline for the current application Definition
+    /// Enable or disable to register into pipeline for the current application Definition.
     /// </summary>
+    /// <remarks>Default values is <c>True</c></remarks>
     public virtual bool Enabled { get; protected set; } = true;
+
+    /// <summary>
+    /// Enables or disables export definition as a content for module that can be exported.
+    /// </summary>
+    /// /// <remarks>Default values is <c>False</c></remarks>
+    public virtual bool Exported { get; protected set; }
 }
