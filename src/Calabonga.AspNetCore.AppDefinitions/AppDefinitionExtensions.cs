@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace Calabonga.AspNetCore.AppDefinitions;
 
+/// <summary>
+/// Extension for <see cref="WebApplicationBuilder"/>
+/// </summary>
 public static class AppDefinitionExtensions
 {
     /// <summary>

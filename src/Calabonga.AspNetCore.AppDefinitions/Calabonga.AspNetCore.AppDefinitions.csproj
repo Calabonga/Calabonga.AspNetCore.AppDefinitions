@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Calabonga.AspNetCore.AppDefinitions</Title>
-		<Version>2.1.0</Version>
+		<Version>2.2.0</Version>
 		<Authors>Calabonga</Authors>
 		<Company>Calabonga Soft</Company>
 		<Product>Calabonga.AspNetCore.AppDefinitions</Product>
@@ -18,7 +18,7 @@
 		<RepositoryUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>calabonga;architecture;definitions;minimal-api;nimble-framework</PackageTags>
-		<PackageReleaseNotes>Modules as plugins posibility was added.</PackageReleaseNotes>
+		<PackageReleaseNotes>Updated for profject template for dotnet CLI</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
