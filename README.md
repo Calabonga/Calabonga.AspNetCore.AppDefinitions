@@ -1,6 +1,6 @@
 # Calabonga.AspNetCore.AppDefinitions
 
-Сборка позволяет навести порядок в вашем `Program.cs`. Можно всё разложить "по полочкам". Чтобы воспользоваться сборкой надо просто установить nuget-пакет Calabonga.AspNetCore.AppDefinitions.
+Сборка позволяет навести порядок в вашем `Program.cs`. Можно всё разложить "по полочкам". А еще можно реализовать систему плагинов. Чтобы воспользоваться сборкой надо просто установить nuget-пакет [Calabonga.AspNetCore.AppDefinitions](https://www.nuget.org/packages/Calabonga.AspNetCore.AppDefinitions/).
 
 ## Что нового
 
