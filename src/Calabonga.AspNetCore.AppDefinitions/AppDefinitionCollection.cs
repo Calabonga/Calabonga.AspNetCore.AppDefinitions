@@ -5,10 +5,17 @@
 /// </summary>
 internal sealed class AppDefinitionCollection
 {
-    internal IList<AppDefinitionItem> Items { get; } = new List<AppDefinitionItem>();
+    private IList<AppDefinitionItem> Items { get; } = new List<AppDefinitionItem>();
 
+    /// <summary>
+    /// Entry points found names
+    /// </summary>
     internal IList<string> EntryPoints { get; } = new List<string>();
 
+    /// <summary>
+    /// Adds collected information to collection
+    /// </summary>
+    /// <param name="definition"></param>
     internal void AddInfo(AppDefinitionItem definition)
     {
         var exists = Items.FirstOrDefault(x => x == definition);
@@ -23,10 +30,21 @@ internal sealed class AppDefinitionCollection
     /// </summary>
     /// <param name="entryPointName"></param>
     public void AddEntryPoint(string entryPointName) => EntryPoints.Add(entryPointName);
-}
 
-/// <summary>
-/// Information about <see cref="IAppDefinition"/>
-/// </summary>
-/// <param name="Definition"></param>
-public sealed record AppDefinitionItem(IAppDefinition Definition, string AssemblyName, bool Enabled, bool Exported);
+    /// <summary>
+    /// Returns ordered and enabled items 
+    /// </summary>
+    internal IEnumerable<AppDefinitionItem> GetEnabled()
+        => Items
+            .Where(x => x.Definition.Enabled)
+            .OrderBy(x => x.Definition.OrderIndex);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    internal IEnumerable<AppDefinitionItem> GetDistinct()
+        => GetEnabled()
+            .Select(x => new { x.Definition.GetType().Name, AppDefinitionItem = x })
+            .DistinctBy(x => x.Name)
+            .Select(x => x.AppDefinitionItem);
+}
