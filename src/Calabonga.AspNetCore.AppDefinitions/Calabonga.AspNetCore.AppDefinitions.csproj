@@ -11,7 +11,7 @@
 		<Company>Calabonga Soft</Company>
 		<Product>Calabonga.AspNetCore.AppDefinitions</Product>
 		<Description>Application Definitions base classes. The small but very helpful packege that can help you to organize your ASP.NET Core application.</Description>
-		<Copyright>Calabonga SOFT © 2001-2023</Copyright>
+		<Copyright>Calabonga SOFT © 2001-$([System.DateTime]::Now.ToString(yyyy))</Copyright>
 		<PackageProjectUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
