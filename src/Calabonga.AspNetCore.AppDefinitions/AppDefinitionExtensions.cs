@@ -22,43 +22,62 @@ public static class AppDefinitionExtensions
     /// <param name="entryPointsAssembly"></param>
     public static void AddDefinitionsWithModules(this WebApplicationBuilder builder, string modulesFolderPath, params Type[] entryPointsAssembly)
     {
-        var modulesFolder = Path.Combine(builder.Environment.ContentRootPath, modulesFolderPath);
+        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<IAppDefinition>>();
 
-        if (!Directory.Exists(modulesFolder))
+        try
         {
-            throw new DirectoryNotFoundException(modulesFolder);
+            var modulesFolder = Path.Combine(builder.Environment.ContentRootPath, modulesFolderPath);
+
+            if (!Directory.Exists(modulesFolder))
+            {
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug("[Error]: Directory not exists {ModuleName}", modulesFolder);
+                }
+                throw new DirectoryNotFoundException(modulesFolder);
+            }
+
+            var types = new List<Type>();
+            types.AddRange(entryPointsAssembly);
+
+            var modulesDirectory = new DirectoryInfo(modulesFolderPath);
+            var modules = modulesDirectory.GetFiles("*.dll");
+            if (!modules.Any())
+            {
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug("[Warning]: No modules found in folder {ModuleName}", modulesFolder);
+                }
+                return;
+            }
+
+            foreach (var fileInfo in modules)
+            {
+                var module = Assembly.LoadFile(fileInfo.FullName);
+                var typesAll = module.GetExportedTypes();
+                var typesDefinition = typesAll
+                    .Where(Predicate)
+                    .ToList();
+
+                var instances = typesDefinition.Select(Activator.CreateInstance)
+                    .Cast<IAppDefinition>()
+                    .Where(x => x.Enabled && x.Exported)
+                    .Select(x => x.GetType())
+                    .ToList();
+
+                types.AddRange(instances);
+            }
+
+            if (types.Any())
+            {
+                AddDefinitions(builder, types.ToArray());
+            }
+
         }
-
-        var types = new List<Type>();
-        types.AddRange(entryPointsAssembly);
-
-        var modulesDirectory = new DirectoryInfo(modulesFolderPath);
-        var modules = modulesDirectory.GetFiles("*.dll");
-        if (!modules.Any())
+        catch (Exception exception)
         {
-            return;
-        }
-
-        foreach (var fileInfo in modules)
-        {
-            var module = Assembly.LoadFile(fileInfo.FullName);
-            var typesAll = module.GetExportedTypes();
-            var typesDefinition = typesAll
-                .Where(Predicate)
-                .ToList();
-
-            var instances = typesDefinition.Select(Activator.CreateInstance)
-                .Cast<IAppDefinition>()
-                .Where(x => x.Enabled && x.Exported)
-                .Select(x => x.GetType())
-                .ToList();
-
-            types.AddRange(instances);
-        }
-
-        if (types.Any())
-        {
-            AddDefinitions(builder, types.ToArray());
+            logger.LogError(exception, exception.Message);
+            throw;
         }
     }
 
@@ -81,65 +100,72 @@ public static class AppDefinitionExtensions
     public static void AddDefinitions(this WebApplicationBuilder builder, params Type[] entryPointsAssembly)
     {
         var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<IAppDefinition>>();
-        var appDefinitionInfo = builder.Services.BuildServiceProvider().GetService<AppDefinitionCollection>();
-        var definitionCollection = appDefinitionInfo ?? new AppDefinitionCollection();
-
-        foreach (var entryPoint in entryPointsAssembly)
+        try
         {
-            definitionCollection.AddEntryPoint(entryPoint.Name);
+            var appDefinitionInfo = builder.Services.BuildServiceProvider().GetService<AppDefinitionCollection>();
+            var definitionCollection = appDefinitionInfo ?? new AppDefinitionCollection();
 
-            var types = entryPoint.Assembly.ExportedTypes.Where(Predicate);
-            var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
-
-            foreach (var definition in instances)
+            foreach (var entryPoint in entryPointsAssembly)
             {
-                definitionCollection.AddInfo(new AppDefinitionItem(definition, entryPoint.Name, definition.Enabled, definition.Exported));
+                definitionCollection.AddEntryPoint(entryPoint.Name);
+
+                var types = entryPoint.Assembly.ExportedTypes.Where(Predicate);
+                var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
+
+                foreach (var definition in instances)
+                {
+                    definitionCollection.AddInfo(new AppDefinitionItem(definition, entryPoint.Name, definition.Enabled, definition.Exported));
+                }
             }
-        }
 
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation("[AppDefinitions entry points found]: {@items}", string.Join(", ", definitionCollection.EntryPoints));
-        }
-
-        var items = definitionCollection.GetDistinct().ToList();
-
-        foreach (var item in items)
-        {
-            if (logger.IsEnabled(LogLevel.Debug))
+            if (logger.IsEnabled(LogLevel.Information))
             {
-                logger.LogDebug("[AppDefinitions for ConfigureServices]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled} {ExportEnabled}",
+                logger.LogInformation("[AppDefinitions entry points found]: {@items}", string.Join(", ", definitionCollection.EntryPoints));
+            }
+
+            var items = definitionCollection.GetDistinct().ToList();
+
+            foreach (var item in items)
+            {
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug("[AppDefinitions for ConfigureServices]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled} {ExportEnabled}",
+                        item.AssemblyName,
+                        item.Definition.GetType().Name,
+                        item.Enabled ? "enabled" : "disabled",
+                        item.Exported ? "(exported)" : "export disabled");
+                }
+
+                item.Definition.ConfigureServices(builder);
+            }
+
+            builder.Services.AddSingleton(definitionCollection);
+
+            if (!logger.IsEnabled(LogLevel.Debug))
+            {
+                return;
+            }
+
+            var skipped = definitionCollection.GetEnabled().Except(items).ToList();
+            if (!skipped.Any())
+            {
+                return;
+            }
+
+            logger.LogWarning("[AppDefinitions skipped for ConfigureServices: {Count}", skipped.Count);
+            foreach (var item in skipped)
+            {
+                logger.LogWarning("[AppDefinitions skipped for ConfigureServices]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled}",
                     item.AssemblyName,
                     item.Definition.GetType().Name,
-                    item.Enabled ? "enabled" : "disabled",
-                    item.Exported ? "(exported)" : "export disabled");
+                    item.Enabled ? "enabled" : "disabled");
             }
-
-            item.Definition.ConfigureServices(builder);
         }
-
-        builder.Services.AddSingleton(definitionCollection);
-
-        if (!logger.IsEnabled(LogLevel.Debug))
+        catch (Exception exception)
         {
-            return;
+            logger.LogError(exception, exception.Message);
+            throw;
         }
-
-        var skipped = definitionCollection.GetEnabled().Except(items).ToList();
-        if (!skipped.Any())
-        {
-            return;
-        }
-
-        logger.LogWarning("[AppDefinitions skipped for ConfigureServices: {Count}", skipped.Count);
-        foreach (var item in skipped)
-        {
-            logger.LogWarning("[AppDefinitions skipped for ConfigureServices]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled}",
-                item.AssemblyName,
-                item.Definition.GetType().Name,
-                item.Enabled ? "enabled" : "disabled");
-        }
-
     }
 
     /// <summary>
