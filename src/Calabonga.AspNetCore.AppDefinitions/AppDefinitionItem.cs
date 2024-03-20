@@ -1,6 +1,5 @@
 ﻿namespace Calabonga.AspNetCore.AppDefinitions;
 
-
 /// <summary>
 /// Information about <see cref="IAppDefinition"/>
 /// </summary>

@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Calabonga.AspNetCore.AppDefinitions</Title>
-		<Version>2.4.0</Version>
+		<Version>2.4.1</Version>
 		<Authors>Calabonga</Authors>
 		<Company>Calabonga Soft</Company>
 		<Product>Calabonga.AspNetCore.AppDefinitions</Product>
@@ -18,7 +18,7 @@
 		<RepositoryUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>calabonga;architecture;application;definitions;minimal-api;nimble-framework</PackageTags>
-		<PackageReleaseNotes>Processing for dublicates was removed. Some additional information added for DEBUG logging.</PackageReleaseNotes>
+		<PackageReleaseNotes>Additional information added for DEBUG logging. Some errors catching added.</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<IncludeSymbols>true</IncludeSymbols>
 		<IncludeSource>true</IncludeSource>
