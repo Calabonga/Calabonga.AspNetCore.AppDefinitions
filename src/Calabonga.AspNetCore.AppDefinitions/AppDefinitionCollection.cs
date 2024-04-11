@@ -37,7 +37,7 @@ internal sealed class AppDefinitionCollection
     internal IEnumerable<AppDefinitionItem> GetEnabled()
         => Items
             .Where(x => x.Definition.Enabled)
-            .OrderBy(x => x.Definition.OrderIndex);
+            .OrderBy(x => x.Definition.ServiceOrderIndex);
 
     /// <summary>
     /// 

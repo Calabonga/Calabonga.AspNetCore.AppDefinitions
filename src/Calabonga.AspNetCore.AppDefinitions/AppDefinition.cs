@@ -22,7 +22,12 @@ public abstract class AppDefinition : IAppDefinition
     /// <summary>
     /// Order index for including into pipeline. Default value is 0 for, that's why order index can be undefined.
     /// </summary>
-    public virtual int OrderIndex => 0;
+    public virtual int ServiceOrderIndex => 0;
+
+    /// <summary>
+    /// Order index for including into pipeline for ConfigureApplication() . Default value is 0 for, that's why order index can be undefined.
+    /// </summary>
+    public int ApplicationOrderIndex => 0;
 
     /// <summary>
     /// Enable or disable to register into pipeline for the current application Definition.
