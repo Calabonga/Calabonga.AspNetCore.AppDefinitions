@@ -4,6 +4,10 @@
 
 ## Что нового
 
+### Версия 2.4.3
+
+* ApplicationOrderIndex сделан virtual для возможности переопределения.
+
 ### Версия 2.4.2
 
 * Для ConfgureApplication() и для ConfigureServices() теперь есть свой собственный индекс сортировки.
