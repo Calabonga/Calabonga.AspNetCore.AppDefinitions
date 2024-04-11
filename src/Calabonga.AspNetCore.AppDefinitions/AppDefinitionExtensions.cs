@@ -110,7 +110,7 @@ public static class AppDefinitionExtensions
                 definitionCollection.AddEntryPoint(entryPoint.Name);
 
                 var types = entryPoint.Assembly.ExportedTypes.Where(Predicate);
-                var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().Where(x => x.Enabled).OrderBy(x => x.OrderIndex).ToList();
+                var instances = types.Select(Activator.CreateInstance).Cast<IAppDefinition>().Where(x => x.Enabled).OrderBy(x => x.ServiceOrderIndex).ToList();
 
                 foreach (var definition in instances)
                 {
@@ -129,11 +129,12 @@ public static class AppDefinitionExtensions
             {
                 if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogDebug("[AppDefinitions for ConfigureServices]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled} {ExportEnabled}",
+                    logger.LogDebug("[AppDefinitions ConfigureServices with order index {@ServiceOrderIndex}]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled} {ExportEnabled}",
+                        item.Definition.ServiceOrderIndex,
                         item.AssemblyName,
                         item.Definition.GetType().Name,
                         item.Enabled ? "enabled" : "disabled",
-                        item.Exported ? "(exported)" : "export disabled");
+                        item.Exported ? "(exportable)" : string.Empty);
                 }
 
                 item.Definition.ConfigureServices(builder);
@@ -152,10 +153,10 @@ public static class AppDefinitionExtensions
                 return;
             }
 
-            logger.LogWarning("[AppDefinitions skipped for ConfigureServices: {Count}", skipped.Count);
+            logger.LogWarning("[AppDefinitions skipped ConfigureServices: {Count}", skipped.Count);
             foreach (var item in skipped)
             {
-                logger.LogWarning("[AppDefinitions skipped for ConfigureServices]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled}",
+                logger.LogWarning("[AppDefinitions skipped ConfigureServices]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled}",
                     item.AssemblyName,
                     item.Definition.GetType().Name,
                     item.Enabled ? "enabled" : "disabled");
@@ -181,13 +182,14 @@ public static class AppDefinitionExtensions
         var logger = source.Services.GetRequiredService<ILogger<AppDefinition>>();
         var definitionCollection = source.Services.GetRequiredService<AppDefinitionCollection>();
 
-        var items = definitionCollection.GetDistinct().ToList();
+        var items = definitionCollection.GetDistinct().OrderBy(x => x.Definition.ApplicationOrderIndex).ToList();
 
         foreach (var item in items)
         {
             if (logger.IsEnabled(LogLevel.Debug))
             {
-                logger.LogDebug("[AppDefinitions for ConfigureApplication]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled}",
+                logger.LogDebug("[AppDefinitions ConfigureApplication with order index {@ApplicationOrderIndex}]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled}",
+                    item.Definition.ApplicationOrderIndex,
                     item.AssemblyName,
                     item.Definition.GetType().Name,
                     item.Enabled
@@ -214,14 +216,14 @@ public static class AppDefinitionExtensions
             return;
         }
 
-        logger.LogWarning("[AppDefinitions skipped for ConfigureApplication: {Count}", skipped.Count);
+        logger.LogWarning("[AppDefinitions skipped ConfigureApplication: {Count}", skipped.Count);
         foreach (var item in skipped)
         {
-            logger.LogWarning("[AppDefinitions skipped for ConfigureApplication]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled} {ExportEnabled}",
+            logger.LogWarning("[AppDefinitions skipped ConfigureApplication]: {@AssemblyName}:{@AppDefinitionName} is {EnabledOrDisabled} {ExportEnabled}",
                 item.AssemblyName,
                 item.Definition.GetType().Name,
                 item.Enabled ? "enabled" : "disabled",
-                item.Exported ? "(exported)" : "export disabled");
+                item.Exported ? "(exportable)" : string.Empty);
         }
 
         logger.LogInformation("[AppDefinitions applied: {Count} of {Total}", items.Count, definitionCollection.GetEnabled().Count());

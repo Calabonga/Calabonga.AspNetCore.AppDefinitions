@@ -20,9 +20,14 @@ public interface IAppDefinition
     void ConfigureApplication(WebApplication app);
 
     /// <summary>
-    /// Order index for including into pipeline. Default value is 0 for, that's why order index can be undefined.
+    /// Order index for including into pipeline for ConfigureServices(). Default value is 0 for, that's why order index can be undefined.
     /// </summary>
-    int OrderIndex { get; }
+    int ServiceOrderIndex { get; }
+
+    /// <summary>
+    /// Order index for including into pipeline for ConfigureApplication() . Default value is 0 for, that's why order index can be undefined.
+    /// </summary>
+    int ApplicationOrderIndex { get; }
 
     /// <summary>
     /// Enable or disable to register into pipeline for the current application Definition.
