@@ -227,6 +227,5 @@ public static class AppDefinitionExtensions
         }
 
         logger.LogInformation("[AppDefinitions applied: {Count} of {Total}", items.Count, definitionCollection.GetEnabled().Count());
-
     }
 }

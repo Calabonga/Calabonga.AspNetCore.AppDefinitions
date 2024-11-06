@@ -3,7 +3,7 @@
 namespace Calabonga.AspNetCore.AppDefinitions;
 
 /// <summary>
-/// Application Definition interface abstraction
+/// Application Definition interface abstraction. A unit of the application.
 /// </summary>
 public interface IAppDefinition
 {
