@@ -26,7 +26,7 @@ internal sealed class AppDefinitionCollection
     }
 
     /// <summary>
-    /// Adding founded item to collection
+    /// Registers item in the collection of the entry point
     /// </summary>
     /// <param name="entryPointName"></param>
     public void AddEntryPoint(string entryPointName) => EntryPoints.Add(entryPointName);
@@ -40,7 +40,7 @@ internal sealed class AppDefinitionCollection
             .OrderBy(x => x.Definition.ServiceOrderIndex);
 
     /// <summary>
-    /// 
+    /// Returns distinct application definition items
     /// </summary>
     internal IEnumerable<AppDefinitionItem> GetDistinct()
         => GetEnabled()
