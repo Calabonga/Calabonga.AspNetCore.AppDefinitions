@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Calabonga.AspNetCore.AppDefinitions</Title>
-		<Version>2.4.3</Version>
+		<Version>3.0.0</Version>
 		<Authors>Calabonga</Authors>
 		<Company>Calabonga Soft</Company>
 		<Product>Calabonga.AspNetCore.AppDefinitions</Product>
@@ -18,7 +18,7 @@
 		<RepositoryUrl>https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>calabonga;architecture;application;definitions;minimal-api;nimble-framework</PackageTags>
-		<PackageReleaseNotes>Split order index fot Services and for Application definitions.</PackageReleaseNotes>
+		<PackageReleaseNotes>Migration to NET8</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<IncludeSymbols>true</IncludeSymbols>
 		<IncludeSource>true</IncludeSource>
