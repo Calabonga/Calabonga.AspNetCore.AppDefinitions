@@ -4,10 +4,14 @@
 
 ## Что нового
 
+### Верси 10.0.0
+
+* Сборка переведена на NET10. Версия сборки выставлена в соответствии с версией платформы NET для упрощения понимания принадлежности к платформе.
+* Файл решения (sln) мигрирован на новый формат (slnx).
+
 ### Версия 4.0.0
 
 * Сборка переведена на NET9. Используйте для версий платформ старых версий предущие версии сборки.
-
 
 ### Версия 3.0.0
 
@@ -53,17 +57,18 @@
 
 ![image5](./docs/without-debug.png)
 
-
 ### Версия 2.2.0
 
 Создан шаблон для генерации проекта `ASP.NET Web API c AppDefinitions`. То есть, чтобы не устанавливать каждый раз `Calabonga.AspNetCore.AppDefinitions` nuget-пакет в новый (в пустой) проект, можно воспользоваться уже готовым шаблоном, который создаст приложение с установленным nuget-пакетом (плюс еще *Serilog*). Это гораздо быстрее и удобнее. Я использую этот шаблона в своих видео на своём канале [boosty.to/calabonga](https://boosty.to/calabonga).
 
- [Проект шаблона с инструкцией по использованию](https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions.Template). 
+ [Проект шаблона с инструкцией по использованию](https://github.com/Calabonga/Calabonga.AspNetCore.AppDefinitions.Template).
 
 ### Версия 2.1.0
 
 * В новой версии появилась возможность подключения модулей к проекту. Достаточно воспользовать новым способом регистрации.
-```
+
+```text
+
 // Вместо этого (instead of)
 builder.AddDefinitions(typeof(Program));
 
@@ -72,8 +77,11 @@ const string moduleFolder = "Modules:Folder";
 var modulesPath = builder.Configuration[moduleFolder] ?? throw new ArgumentNullException(moduleFolder);
 builder.AddDefinitionsWithModules(modulesPath, typeof(Program));
 ```
+
 * Вывод зарегистрированных AppDefinitions усовершенствована.
-```
+
+```text
+
 [15:43:03 DBG] [AppDefinitions]: From Program
 [15:43:03 DBG] [AppDefinitions]: AuthorizationDefinition (Program) (Enabled: Yes)
 [15:43:03 DBG] [AppDefinitions]: AuthorizeEndpoints (Program) (Enabled: Yes)
@@ -96,8 +104,11 @@ builder.AddDefinitionsWithModules(modulesPath, typeof(Program));
 [15:43:03 DBG] From Program assemblies totally AppDefinitions found: 18
 [15:43:04 DBG] Total AppDefinitions applied: 18
 ```
+
 * Появилась возможность не только включать/выключать определенные AppDefinitions, но и указывать нужно ли их экспортировать или нет. Обратите внимание, что по умолчанию `Exported` свойство задано как `False`, то есть, не экспортировать данный `AppDefinition`. Например, если регистрацию конечной точки (endpoint) `WeatherForcast` слелать через определение (AppDefinition), то экспорт мог бы выглядеть так:
-```
+
+```text
+
 public class WeatherForecastEndpoints : AppDefinition
 {
     /// <summary>
@@ -138,6 +149,7 @@ public class WeatherForecastEndpoints : AppDefinition
 ### Версия 2.0.0
 
 * Больше не требуется вливать зависимость `IServiceCollection` в метод `ConfigureServices`. Теперь достаточно только `WebApplicationBuilder`. Следовательно при переходе на версию 2.0.0 нужно просто удалить лишние зависимости. Например, регистрация `FluentValidation` это выглядит так:
+
 ``` csharp
 /// <summary>
 /// FluentValidation registration as Application definition
@@ -161,6 +173,7 @@ public class FluentValidationDefinition : AppDefinition
 ```
 
 * Регистрация стала гораздо проще.
+
 ``` csharp
 builder.AddDefinitions(typeof(Program));
 ```
@@ -198,6 +211,7 @@ builder.AddDefinitions(typeof(Program));
 У каждого из созданных вами наследников от `AppDefinition` есть свойство `Enabled` и `OrderIndex`. Угадайте, что можно с ними (с `AppDefinition`ами) сделать?
 
 # An English
+
 Application Definitions base classes. The small but very helpful package that can help you to organize your ASP.NET Core application.
 
 You can find more information in my blog [Nimble Framework](https://www.calabonga.net/blog/post/nimble-framework-v-6-1)
